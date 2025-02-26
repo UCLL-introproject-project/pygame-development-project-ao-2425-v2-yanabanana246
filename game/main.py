@@ -8,7 +8,7 @@ pygame.init()
 cards = ['2', '3','4','5','6','7','8','9','10','J','Q','K','A']
 one_deck= 4 * cards
 decks = 4
-game_deck = copy.deepcopy(decks * one_deck)
+
 WIDTH = 600
 HEIGHT = 900
 screen = pygame.display.set_mode([WIDTH,HEIGHT])
@@ -17,12 +17,25 @@ fps = 60
 timer = pygame.time.Clock()
 
 font = pygame.font.SysFont('freesantbold.ttf',44)
-active = True
+active = False
 
 # win , loss, draw/tie
 records = [0,0,0]
 player_score= 0
 dealer_score = 0
+initial_deal = False
+my_hand= []
+dealer_hand= []
+outcome = 0
+
+# deal cards by selecting randomly from deck, and make function for one card at a time
+
+def deal_cards( current_hand,current_deck):
+    card= random.randint(0, len(current_deck))
+    current_hand.append(current_deck[card-1])
+    current_deck.pop(card-1)
+    print(current_hand,current_deck)
+    return current_hand,current_deck
 
 # draw game conditions and buttons
 def draw_game(act,records):
@@ -62,12 +75,34 @@ while run:
     # run game at our framrate and fill sceen with bg color
     timer.tick(fps)
     screen.fill('black')
+
+    # initial deal to player and dealer
+    if initial_deal:
+        for i in range(2):
+            my_hand, game_deck = deal_cards(my_hand,game_deck)
+            dealer_hand, game_deck = deal_cards(dealer_hand,game_deck)
+        print (my_hand,dealer_hand)
+        initial_deal= False
+            
+
+
+
+    # once game is activated, and dealt, calculate scores and display cards
     buttons=draw_game(active,records)
 
     # enent hhandling, if quit pressed, then exit game
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
+        if event.type == pygame.MOUSEBUTTONUP:
+            if not active:
+                if buttons[0].collidepoint(event.pos):
+                    active =True
+                    initial_deal = True
+                    game_deck = copy.deepcopy(decks * one_deck)
+                    my_hand = []
+                    dealer_hand= []
+                    outcome = 0
         
     pygame.display.flip()
 pygame.quit()
