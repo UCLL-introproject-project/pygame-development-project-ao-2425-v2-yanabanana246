@@ -18,6 +18,7 @@ timer = pygame.time.Clock()
 
 font = pygame.font.SysFont('freesantbold.ttf',44)
 active = False
+money_changed=False
 
 # win , loss, draw/tie
 records = [0,0,0]
@@ -30,8 +31,19 @@ outcome = 0
 reveal_dealer=False
 hand_active= False
 outcome = 0
+test_money=0
 add_score= False
 results= ['', 'Player busted o_0', 'Player wins! :)', 'Dealer wins:(', 'Tie game...']
+
+# money
+start_money=100
+money  = start_money
+money_bet= 20
+money_updated=False
+
+# aantaal games 
+aantal_games=0
+
 # deal cards by selecting randomly from deck, and make function for one card at a time
 
 def deal_cards( current_hand,current_deck):
@@ -41,7 +53,10 @@ def deal_cards( current_hand,current_deck):
     
 
     return current_hand,current_deck
+# show the amount of money you have and the amount you bet.
+def draw_money(money,result):
 
+    screen.blit(font.render(f' Money [{money}]',True,'white'),(0,0) )
 # draw scores for players and dealer on screen 
 def draw_scores(player,dealer):
     screen.blit(font.render(f'Score[{player}]', True,'white'),(350,400))
@@ -102,8 +117,10 @@ def calculate_score(hand):
 
 
 
+
+
 # draw game conditions and buttons
-def draw_game(act,records,result):
+def draw_game(act,records,result,aantal_games,money):
     button_list = []
     # intitlaly on startuup ( not active )  only option is to deal new hand
     if not act: 
@@ -112,6 +129,7 @@ def draw_game(act,records,result):
         deal_text = font.render('DEAL HAND', True, 'black')
         screen.blit(deal_text,(200,50))
         button_list.append(deal)
+        screen.blit(font.render(f' Money {money}',True,'white'),(0,0) )
     # one game started, shot hit and stand buttons and  win/loss records
     else:
         
@@ -127,6 +145,10 @@ def draw_game(act,records,result):
         button_list.append(stand)
         score_text = font.render (f'Wins: {records[0]} Losses: {records[1]} Tie: {records[2]}', True,'white')
         screen.blit(score_text, (15, 840))
+        screen.blit(font.render(f' Money {money}',True,'white'),(0,0) )
+        aantal_games+=1
+
+        
     
     #if ther is an outcome for the hand tat was played, display a restart button an tell user what happend
     if result != 0:
@@ -139,8 +161,7 @@ def draw_game(act,records,result):
         screen.blit(deal_text,(165,250))
         button_list.append(deal)
     return button_list
-
-
+    
 # check endgam conditions function 
 def check_endgame(hand_act,deal_score,play_score,result,totals, add):
     # check end game scenarios is player has stood, busted or blackjacked 
@@ -165,6 +186,18 @@ def check_endgame(hand_act,deal_score,play_score,result,totals, add):
 
             add = False
     return result, totals, add
+
+def calculate_money(start_money, result, current_money):
+    if result == 1:  # Player busted
+        return current_money - money_bet
+    elif result == 2:  # Player wins
+        return current_money + money_bet
+    elif result == 3:  # Dealer wins
+        return current_money - money_bet
+    elif result == 4:  # Tie game
+        return current_money  # No money change
+    return current_money  # Default case
+
 
 
 # main game  loop 
@@ -196,9 +229,9 @@ while run:
             if dealer_score<17:                 #soft sefteen is possible modification 
                 dealer_hand, game_deck= deal_cards(dealer_hand,game_deck)
         draw_scores(player_score,dealer_score)        
-    buttons=draw_game(active,records,outcome)
+    buttons=draw_game(active,records,outcome,aantal_games,money)
 
-    # enent hhandling, if quit pressed, then exit game
+    # enent handling, if quit pressed, then exit game
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
@@ -212,16 +245,17 @@ while run:
                     dealer_hand= []
                     outcome = 0
                     hand_active =True
-                    outcome = 0
                     add_score= True
+                    money_updated=False
             else:
                 # if player can hit, allo them to draw a card 
                 if buttons[0].collidepoint(event.pos) and player_score< 21  and hand_active:
-                    my_hand, game_deck_deck = deal_cards(my_hand,game_deck)
+                    my_hand, game_deck = deal_cards(my_hand,game_deck)
                 # allow player to end turn ( stand)
                 elif buttons[1].collidepoint(event.pos) and not reveal_dealer:
                     reveal_dealer= True
                     hand_active=False
+                    
                 elif len (buttons) == 3:
                     if buttons[2].collidepoint(event.pos):
                         active =True
@@ -236,6 +270,7 @@ while run:
                         add_score= True
                         dealer_score=0
                         player_score=0
+                        money_updated=False
 
 
     # if player busts, autmaticlly end turn - treat like a stand
@@ -244,9 +279,11 @@ while run:
         reveal_dealer = True
     
     outcome , records,add_score= check_endgame(hand_active, dealer_score, player_score,outcome,records,add_score)
-
-
-
+    
+        
+    if outcome != 0 and not money_updated:
+        money = calculate_money(start_money, outcome, money)
+        money_updated = True
 
 
 
