@@ -253,7 +253,7 @@ def draw_game(act, records, result, aantal_games, money):
     return button_list
 # check endgam conditions function 
 def check_endgame(hand_act, deal_score, play_score, result, totals, add):
-    # First check if my_hand exists and has cards
+    # First check if my_hand exists and has elements
     if my_hand and len(my_hand) > 0:
         # For split hands
         if isinstance(my_hand[0], list) and len(my_hand) == 2:
@@ -261,16 +261,19 @@ def check_endgame(hand_act, deal_score, play_score, result, totals, add):
             hand2_score = calculate_score(my_hand[1])
             
             if not hand_act and deal_score >= 17:
-                # Check if either hand is a winner
+                # Check winning conditions for each hand
                 hand1_wins = (hand1_score <= 21 and (hand1_score > deal_score or deal_score > 21))
                 hand2_wins = (hand2_score <= 21 and (hand2_score > deal_score or deal_score > 21))
+                hand1_ties = (hand1_score == deal_score and hand1_score <= 21)
+                hand2_ties = (hand2_score == deal_score and hand2_score <= 21)
                 
+                # If either hand wins, player wins
                 if hand1_wins or hand2_wins:
                     result = 2  # Player wins
-                # Check for tie - both hands must tie or one ties while other busts
-                elif ((hand1_score == deal_score and hand1_score <= 21) and 
-                      (hand2_score == deal_score and hand2_score <= 21)):
+                # If no winning hand but at least one hand ties, it's a tie
+                elif hand1_ties or hand2_ties:
                     result = 4  # Tie game
+                # If no wins and no ties, dealer wins
                 else:
                     result = 3  # Dealer wins
                     
@@ -326,9 +329,9 @@ def calculate_money(start_money, result, current_money, money_bet, want_split,do
     elif result == 4:  # Tie game
         return current_money  # No money change
     return current_money  # Default case
-def change_color_double_down(double_down,stand):
+def change_color_double_down(double_down, stand):
     if double_down and not stand:
-        pygame.draw.rect(screen, 'purple', [300, 100, 300, 100], 3, 5)
+        pygame.draw.rect(screen, 'purple', [300, 0, 300, 100], 3, 5)
     
 
 def quit_game(money):
@@ -433,6 +436,7 @@ while run:
                     dealer_hand, game_deck = deal_cards(dealer_hand, game_deck)
             draw_scores(player_score, dealer_score)
     buttons = draw_game(active, records, outcome, aantal_games, money)
+    change_color_double_down(double_down, stand)
 
     # enent handling, if quit pressed, then exit game
     for event in pygame.event.get():

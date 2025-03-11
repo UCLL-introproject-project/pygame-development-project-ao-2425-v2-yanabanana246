@@ -261,16 +261,19 @@ def check_endgame(hand_act, deal_score, play_score, result, totals, add):
             hand2_score = calculate_score(my_hand[1])
             
             if not hand_act and deal_score >= 17:
-                # Check if either hand is a winner
+                # Check winning conditions for each hand
                 hand1_wins = (hand1_score <= 21 and (hand1_score > deal_score or deal_score > 21))
                 hand2_wins = (hand2_score <= 21 and (hand2_score > deal_score or deal_score > 21))
+                hand1_ties = (hand1_score == deal_score and hand1_score <= 21)
+                hand2_ties = (hand2_score == deal_score and hand2_score <= 21)
                 
+                # If either hand wins, player wins
                 if hand1_wins or hand2_wins:
                     result = 2  # Player wins
-                # Check for tie - both hands must tie or one ties while other busts
-                elif ((hand1_score == deal_score and hand1_score <= 21) and 
-                      (hand2_score == deal_score and hand2_score <= 21)):
+                # If no winning hand but at least one hand ties, it's a tie
+                elif hand1_ties or hand2_ties:
                     result = 4  # Tie game
+                # If no wins and no ties, dealer wins
                 else:
                     result = 3  # Dealer wins
                     
