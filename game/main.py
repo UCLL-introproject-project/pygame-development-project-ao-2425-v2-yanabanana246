@@ -35,8 +35,8 @@ add_score = False
 results = ['', 'Player busted o_0', 'Player wins! :)', 'Dealer wins:(', 'Tie game...']
 
 # money
-start_money = 100
-money = start_money
+start_money = 100  # or whatever starting amount you want
+money = start_money  # This ensures money starts as an integer
 money_bet = 20
 money_updated = False
 # split
@@ -45,7 +45,10 @@ amount_splits = 0
 want_split = False
 current_hand_index = 0  # Track which hand is active during split
 
-# aantaal games
+# double down
+double_down = False
+
+# aantaal games 
 aantal_games = 0
 
 # deal cards by selecting randomly from deck, and make function for one card at a time
@@ -63,15 +66,18 @@ def deal_cards(current_hand, current_deck, want_split=False, hand_index=0):
 
 # show the amount of money you have and the amount you bet.
 def draw_money(money, result):
+    
     screen.blit(font.render(f' Money [{money}]', True, 'white'), (0, 0))
-
-# draw scores for players and dealer on screen
+    if money == 'All your money is gone':
+        print('quiet')
+    
+# draw scores for players and dealer on screen 
 def draw_scores(player, dealer):
     screen.blit(font.render(f'Score[{player}]', True, 'white'), (350, 400))
     if reveal_dealer:
         screen.blit(font.render(f'Score[{dealer}]', True, 'white'), (350, 100))
 
-# draw cards visually ont screen
+# draw cards visually ont screen 
 def draw_cards(player, dealer, reveal):
     if not isinstance(player[0], list):
         for i in range(len(player)):
@@ -132,7 +138,7 @@ def draw_split_hands(split_hands, dealer_hand, reveal_dealer, current_hand_index
         if i != 0 or reveal_dealer:
             screen.blit(font.render(dealer_hand[i], True, 'black'), (75 + 70 * i, 165 + 5 * i))
             screen.blit(font.render(dealer_hand[i], True, 'black'), (75 + 70 * i, 335 + 5 * i))
-        else:
+        else: 
             screen.blit(font.render('???', True, 'black'), (75+ 70 * i, 165 + 5 * i))
             screen.blit(font.render('???', True, 'black'), (75 + 70 * i, 335 + 5 * i))
         pygame.draw.rect(screen, 'blue', [70 + (70 * i), 160 + (5 * i), 120, 220], 5, 5)
@@ -166,14 +172,14 @@ def calculate_score(hand):
     aces_count = hand.count('A')
     for i in range(len(hand)):
         # for 23456789 - just add the number to total 
-
+        
         for j in range(8):
             if hand[i] == cards[j]:
                 hand_score += int(hand[i])
-         # for 10 and cars, add 10
+        # for 10 and cars, add 10
         if hand[i] in ['10', 'J', 'Q', 'K']:
             hand_score += 10
-         # for aces start by adding 11, we'll check if we need to reduce afterwards 
+        # for aces start by adding 11, we'll check if we need to reduce afterwards 
         elif hand[i] == 'A':
             hand_score += 11
     # determine how many aces need to be 1 instead of 11 to get under 21 if possible 
@@ -188,32 +194,43 @@ def draw_game(act, records, result, aantal_games, money):
     button_list = []
     # intitlaly on startuup ( not active )  only option is to deal new hand
 
-    if not act:
+    if not act: 
         deal = pygame.draw.rect(screen, 'white', [150, 20, 300, 100], 0, 5)
         pygame.draw.rect(screen, 'green', [150, 20, 300, 100], 3, 5)
         deal_text = font.render('DEAL HAND', True, 'black')
         screen.blit(deal_text, (200, 50))
         button_list.append(deal)
         screen.blit(font.render(f' Money {money}', True, 'white'), (0, 0))
-    # one game started, shot hit and stand , split ( if needed)buttons and  win/loss records
+    # one game started, shot hit and stand , split ( if needed), Double down buttons and  win/loss records
 
     else:
+        # 00
         hit = pygame.draw.rect(screen, 'white', [0, 700, 300, 100], 0, 5)
         pygame.draw.rect(screen, 'green', [0, 700, 300, 100], 3, 5)
         hit_text = font.render('HIT ME', True, 'black')
         screen.blit(hit_text, (55, 735))
         button_list.append(hit)
+        # 01
         stand = pygame.draw.rect(screen, 'white', [300, 700, 300, 100], 0, 5)
         pygame.draw.rect(screen, 'green', [300, 700, 300, 100], 3, 5)
         stand_text = font.render('STAND', True, 'black')
         screen.blit(stand_text, (355, 735))
         button_list.append(stand)
+        #02
+        double_down = pygame.draw.rect(screen, 'white', [300, 100, 300, 100], 0, 5)
+        pygame.draw.rect(screen, 'gold', [300, 100, 300, 100], 3, 5)
+        double_down_text = font.render('Double Down', True, 'black')
+        screen.blit(double_down_text, (355, 135))
+        button_list.append(double_down)
+
         score_text = font.render(f'Wins: {records[0]} Losses: {records[1]} Tie: {records[2]}', True, 'white')
         screen.blit(score_text, (15, 840))
         screen.blit(font.render(f' Money {money}', True, 'white'), (0, 0))
         aantal_games += 1
-        # draws splitbutton if apllicable 
 
+        
+        # draws splitbutton if apllicable 
+        #03
         if possiblility_split(my_hand):
             split = pygame.draw.rect(screen, 'white', [300, 500, 300, 100], 0, 5)
             pygame.draw.rect(screen, 'green', [300, 500, 300, 100], 3, 5)
@@ -230,6 +247,7 @@ def draw_game(act, records, result, aantal_games, money):
         deal_text = font.render('New HAND', True, 'black')
         screen.blit(deal_text, (165, 250))
         button_list.append(deal)
+  #  print(button_list)
     return button_list
 # check endgam conditions function 
 def check_endgame(hand_act, deal_score, play_score, result, totals, add):
@@ -242,9 +260,9 @@ def check_endgame(hand_act, deal_score, play_score, result, totals, add):
             result = 2
         elif play_score < deal_score <= 21:
             result = 3
-        else:
+        else: 
             result = 4
-        if add:
+        if add: 
             if result == 1 or result == 3:
                 totals[1] += 1
             elif result == 2:
@@ -254,16 +272,94 @@ def check_endgame(hand_act, deal_score, play_score, result, totals, add):
             add = False
     return result, totals, add
 # need to add somthing so that it says i lost all my money!
-def calculate_money(start_money, result, current_money):
-    if result == 1:  # Player busted
+def calculate_money(start_money, result, current_money, money_bet, want_split,double_down):
+    # Convert current_money to int if it's a string
+    if isinstance(current_money, str):
+        try:
+            current_money = int(current_money)
+        except ValueError:
+            return 0  # Return 0 if conversion fails
+            
+    if want_split or double_down:
+        money_bet *= 2
+        
+
+        
+    if result in [1, 3]:  # Player busted or Dealer wins
         return current_money - money_bet
     elif result == 2:  # Player wins
         return current_money + money_bet
-    elif result == 3:  # Dealer wins
-        return current_money - money_bet
     elif result == 4:  # Tie game
         return current_money  # No money change
     return current_money  # Default case
+
+def quit_game(money):
+    if isinstance(money, str):
+        try:
+            money = int(money)
+        except ValueError:
+            money = 0
+            
+    if money <= 0:
+        # Initialize pygame clock
+        clock = pygame.time.Clock()
+        countdown_duration = 20  # seconds
+        start_time = pygame.time.get_ticks()
+
+        while True:
+            clock.tick(60)  # Limit to 60 FPS for smooth display
+            current_time = pygame.time.get_ticks()
+            elapsed_time = (current_time - start_time) // 1000
+            time_remaining = countdown_duration - elapsed_time
+
+            if time_remaining <= 0:
+                break
+
+            # Clear screen
+            screen.fill('black')
+            
+            # Draw Game Over text
+            game_over_text = font.render('Game Over - Out of Money!', True, 'red')
+            screen.blit(game_over_text, (WIDTH//2 - game_over_text.get_width()//2, HEIGHT//2 - 100))
+            
+            # Draw Statistics
+            stats_text = font.render('Final Statistics:', True, 'white')
+            screen.blit(stats_text, (WIDTH//2 - stats_text.get_width()//2, HEIGHT//2 - 20))
+            
+            wins_text = font.render(f'Wins: {records[0]}', True, 'green')
+            losses_text = font.render(f'Losses: {records[1]}', True, 'red')
+            ties_text = font.render(f'Ties: {records[2]}', True, 'yellow')
+            
+            screen.blit(wins_text, (WIDTH//2 - wins_text.get_width()//2, HEIGHT//2 + 20))
+            screen.blit(losses_text, (WIDTH//2 - losses_text.get_width()//2, HEIGHT//2 + 60))
+            screen.blit(ties_text, (WIDTH//2 - ties_text.get_width()//2, HEIGHT//2 + 100))
+            
+            # Calculate and display win percentage
+            total_games = sum(records)
+            if total_games > 0:
+                win_percentage = (records[0] / total_games) * 100
+                percentage_text = font.render(f'Win Rate: {win_percentage:.1f}%', True, 'white')
+                screen.blit(percentage_text, (WIDTH//2 - percentage_text.get_width()//2, HEIGHT//2 + 140))
+
+            # Draw countdown timer
+            minutes = time_remaining // 60
+            seconds = time_remaining % 60
+            timer_text = font.render(f'Game closing in: {minutes:02d}:{seconds:02d}', True, 'white')
+            screen.blit(timer_text, (WIDTH//2 - timer_text.get_width()//2, HEIGHT - 100))
+
+            # Update display
+            pygame.display.flip()
+
+            # Handle only the quit event (X button)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return False
+
+            # Small delay to prevent CPU overuse
+            pygame.time.delay(16)  # approximately 60 FPS
+
+        return False
+    return True
 
 # main game  loop 
 run = True
@@ -357,27 +453,8 @@ while run:
                         hand_active = False
                         reveal_dealer = True
 
-                elif len(buttons) == 3:
-                    if buttons[2].collidepoint(event.pos) and '<rect(150, 220, 300, 100)>' in str(buttons):
-                        active = True
-                        initial_deal = True
-                        game_deck = copy.deepcopy(decks * one_deck)
-                        my_hand = []
-                        dealer_hand = []
-                        outcome = 0
-                        hand_active = True
-                        reveal_dealer = False
-                        outcome = 0
-                        add_score = True
-                        dealer_score = 0
-                        player_score = 0
-                        money_updated = False
-                        current_hand_index = 0
-                    elif buttons[2].collidepoint(event.pos) and '<rect(300, 500, 300, 100)>' in str(buttons):
-                        want_split = True
-                        my_hand = split_cards(want_split, my_hand)
-                        split_cards(want_split, my_hand)
                 elif len(buttons) == 4:
+                    #start game
                     if buttons[3].collidepoint(event.pos) and '<rect(150, 220, 300, 100)>' in str(buttons):
                         active = True
                         initial_deal = True
@@ -393,21 +470,67 @@ while run:
                         player_score = 0
                         money_updated = False
                         current_hand_index = 0
+                        double_down=False
+                        want_split=False
+
+
+                        
+
+                        # makes the split option 
+                    elif buttons[3].collidepoint(event.pos) and '<rect(300, 500, 300, 100)>' in str(buttons):
+                        want_split = True
+                        my_hand = split_cards(want_split, my_hand)
+                        split_cards(want_split, my_hand)
+                    # try double down 
+                    elif buttons[3].collidepoint(event.pos) and '<rect(300, 100, 300, 100)>' in str(buttons):
+                        print('works')
+                        double_down = True
+                        pygame.draw.rect(screen, 'purple', [300, 100, 300, 100], 3, 5)
+
+
+                elif len(buttons) == 3:
+                    #start game
+                    if buttons[2].collidepoint(event.pos) and '<rect(150, 220, 300, 100)>' in str(buttons):
+                        active = True
+                        initial_deal = True
+                        game_deck = copy.deepcopy(decks * one_deck)
+                        my_hand = []
+                        dealer_hand = []
+                        outcome = 0
+                        hand_active = True
+                        reveal_dealer = False
+                        outcome = 0
+                        add_score = True
+                        dealer_score = 0
+                        player_score = 0
+                        money_updated = False
+                        current_hand_index = 0
+                        
+
+                        # makes the split option 
                     elif buttons[2].collidepoint(event.pos) and '<rect(300, 500, 300, 100)>' in str(buttons):
                         want_split = True
                         my_hand = split_cards(want_split, my_hand)
                         split_cards(want_split, my_hand)
-                        
+                    # try double down 
+                    elif buttons[2].collidepoint(event.pos) and '<rect(300, 100, 300, 100)>' in str(buttons):
+                        print('works')
+                        double_down = True
+                       
+                        pygame.draw.rect(screen, 'purple', [300, 100, 300, 100], 3, 5)
+
+
+
     # if player busts, autmaticlly end turn - treat like a stand
     if hand_active and not want_split and calculate_score(my_hand) > 21:
         hand_active = False
         reveal_dealer = True
-
+    
     outcome, records, add_score = check_endgame(hand_active, dealer_score, player_score, outcome, records, add_score)
 
     if outcome != 0 and not money_updated:
-        money = calculate_money(start_money, outcome, money)
+        money = calculate_money(start_money, outcome, money,money_bet,want_split,double_down)
         money_updated = True
-
+        run = quit_game(money)
     pygame.display.flip()
 pygame.quit()
