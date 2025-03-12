@@ -2,6 +2,34 @@ import copy
 import random
 import pygame
 
+
+LEFT_SPLIT_BUTTON         = 300
+TOP_SPLIT_BUTTON          = 500
+WIDTH_SPLIT_BUTTON        = 300
+HEIGHT_SPLIT_BUTTON       = 100
+
+LEFT_DEAL_BUTTON          = 150
+TOP_DEAL_BUTTON           = 220
+WIDTH_DEAL_BUTTON         = 300
+HEIGHT_DEAL_BUTTON        = 100
+
+LEFT_HIT_BUTTON           = 0
+TOP_HIT_BUTTON            = 700
+WIDTH_HIT_BUTTON          = 300
+HEIGHT_HIT_BUTTON         = 100
+
+LEFT_STAND_BUTTON         = 300
+TOP_STAND_BUTTON          = 700
+WIDTH_STAND_BUTTON        = 300
+HEIGHT_STAND_BUTTON       = 100
+
+LEFT_DOUBLE_DOWN_BUTTON   = 300
+TOP_DOUBLE_DOWN_BUTTON    = 0
+WIDTH_DOUBLE_DOWN_BUTTON  = 300
+HEIGHT_DOUBLE_DOWN_BUTTON = 100
+
+
+
 # game variables
 pygame.init()
 cards = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
@@ -197,32 +225,32 @@ def draw_game(act, records, result, aantal_games, money):
     # intitlaly on startuup ( not active )  only option is to deal new hand
 
     if not act: 
-        deal = pygame.draw.rect(screen, 'white', [150, 20, 300, 100], 0, 5)
-        pygame.draw.rect(screen, 'green', [150, 20, 300, 100], 3, 5)
+        deal = pygame.draw.rect(screen, 'white', [LEFT_DEAL_BUTTON, TOP_DEAL_BUTTON, WIDTH_DEAL_BUTTON, HEIGHT_DEAL_BUTTON], 0, 5)
+        pygame.draw.rect(screen, 'green', [LEFT_DEAL_BUTTON, TOP_DEAL_BUTTON, WIDTH_DEAL_BUTTON, HEIGHT_DEAL_BUTTON], 3, 5)
         deal_text = font.render('DEAL HAND', True, 'black')
-        screen.blit(deal_text, (200, 50))
+        screen.blit(deal_text, (LEFT_DEAL_BUTTON+55, TOP_DEAL_BUTTON+35))
         button_list.append(deal)
         screen.blit(font.render(f' Money {money}', True, 'white'), (0, 0))
     # one game started, shot hit and stand , split ( if needed), Double down buttons and  win/loss records
 
     else:
         # 00
-        hit = pygame.draw.rect(screen, 'white', [0, 700, 300, 100], 0, 5)
-        pygame.draw.rect(screen, 'green', [0, 700, 300, 100], 3, 5)
+        hit = pygame.draw.rect(screen, 'white', [LEFT_HIT_BUTTON, TOP_HIT_BUTTON, WIDTH_HIT_BUTTON, HEIGHT_HIT_BUTTON], 0, 5)
+        pygame.draw.rect(screen, 'green', [LEFT_HIT_BUTTON, TOP_HIT_BUTTON, WIDTH_HIT_BUTTON, HEIGHT_HIT_BUTTON], 3, 5)
         hit_text = font.render('HIT ME', True, 'black')
-        screen.blit(hit_text, (55, 735))
+        screen.blit(hit_text, (LEFT_HIT_BUTTON+55, TOP_HIT_BUTTON+35))
         button_list.append(hit)
         # 01
-        stand = pygame.draw.rect(screen, 'white', [300, 700, 300, 100], 0, 5)
-        pygame.draw.rect(screen, 'green', [300, 700, 300, 100], 3, 5)
+        stand = pygame.draw.rect(screen, 'white', [LEFT_STAND_BUTTON, TOP_STAND_BUTTON, WIDTH_STAND_BUTTON, HEIGHT_STAND_BUTTON], 0, 5)
+        pygame.draw.rect(screen, 'green', [LEFT_STAND_BUTTON, TOP_STAND_BUTTON, WIDTH_STAND_BUTTON, HEIGHT_STAND_BUTTON], 3, 5)
         stand_text = font.render('STAND', True, 'black')
-        screen.blit(stand_text, (355, 735))
+        screen.blit(stand_text, (LEFT_STAND_BUTTON+55, TOP_STAND_BUTTON+35))
         button_list.append(stand)
         #02
-        double_down = pygame.draw.rect(screen, 'white', [300, 0, 300, 100], 0, 5)
-        pygame.draw.rect(screen, 'gold', [300, 0, 300, 100], 3, 5)
+        double_down = pygame.draw.rect(screen, 'white', [LEFT_DOUBLE_DOWN_BUTTON, TOP_DOUBLE_DOWN_BUTTON, WIDTH_DOUBLE_DOWN_BUTTON, HEIGHT_DOUBLE_DOWN_BUTTON], 0, 5)
+        pygame.draw.rect(screen, 'gold', [LEFT_DOUBLE_DOWN_BUTTON, TOP_DOUBLE_DOWN_BUTTON, WIDTH_DOUBLE_DOWN_BUTTON, HEIGHT_DOUBLE_DOWN_BUTTON], 3, 5)
         double_down_text = font.render('Double Down', True, 'black')
-        screen.blit(double_down_text, (355, 35))
+        screen.blit(double_down_text, (LEFT_DOUBLE_DOWN_BUTTON+55, TOP_DOUBLE_DOWN_BUTTON+35))
         button_list.append(double_down)
 
         score_text = font.render(f'Wins: {records[0]} Losses: {records[1]} Tie: {records[2]}', True, 'white')
@@ -234,20 +262,20 @@ def draw_game(act, records, result, aantal_games, money):
         # draws splitbutton if apllicable 
         #03
         if possiblility_split(my_hand):
-            split = pygame.draw.rect(screen, 'white', [300, 500, 300, 100], 0, 5)
-            pygame.draw.rect(screen, 'green', [300, 500, 300, 100], 3, 5)
+            split = pygame.draw.rect(screen, 'white', [LEFT_SPLIT_BUTTON, TOP_SPLIT_BUTTON, WIDTH_SPLIT_BUTTON, HEIGHT_SPLIT_BUTTON], 0, 5)
+            pygame.draw.rect(screen, 'green', [LEFT_SPLIT_BUTTON, TOP_SPLIT_BUTTON, WIDTH_SPLIT_BUTTON, HEIGHT_SPLIT_BUTTON], 3, 5)
             split_text = font.render('Split ?', True, 'black')
-            screen.blit(split_text, (400, 535))
+            screen.blit(split_text, (LEFT_SPLIT_BUTTON+100, TOP_SPLIT_BUTTON+35))
             button_list.append(split)
     #if ther is an outcome for the hand tat was played, display a restart button an tell user what happend
 
     if result != 0:
         screen.blit(font.render(results[result], True, 'white'), (15, 25))
-        deal = pygame.draw.rect(screen, 'white', [150, 220, 300, 100], 0, 5)
-        pygame.draw.rect(screen, 'green', [150, 220, 300, 100], 3, 5)
-        pygame.draw.rect(screen, 'black', [153, 223, 294, 94], 3, 5)
+        deal = pygame.draw.rect(screen, 'white', [LEFT_DEAL_BUTTON, TOP_DEAL_BUTTON, WIDTH_DEAL_BUTTON, HEIGHT_DEAL_BUTTON], 0, 5)
+        pygame.draw.rect(screen, 'green', [LEFT_DEAL_BUTTON, TOP_DEAL_BUTTON, WIDTH_DEAL_BUTTON, HEIGHT_DEAL_BUTTON], 3, 5)
+        pygame.draw.rect(screen, 'black', [LEFT_DEAL_BUTTON+3, TOP_DEAL_BUTTON+3, WIDTH_DEAL_BUTTON-6, HEIGHT_DEAL_BUTTON-6], 3, 5)
         deal_text = font.render('New HAND', True, 'black')
-        screen.blit(deal_text, (165, 250))
+        screen.blit(deal_text, (LEFT_DEAL_BUTTON+15, TOP_DEAL_BUTTON+30))
         button_list.append(deal)
   #  print(button_list)
     return button_list
@@ -331,7 +359,7 @@ def calculate_money(start_money, result, current_money, money_bet, want_split,do
     return current_money  # Default case
 def change_color_double_down(double_down, stand):
     if double_down and not stand:
-        pygame.draw.rect(screen, 'purple', [300, 0, 300, 100], 3, 5)
+        pygame.draw.rect(screen, 'purple', [LEFT_DOUBLE_DOWN_BUTTON, TOP_DOUBLE_DOWN_BUTTON, WIDTH_DOUBLE_DOWN_BUTTON, HEIGHT_DOUBLE_DOWN_BUTTON], 3, 5)
     
 
 def quit_game(money):
@@ -402,6 +430,31 @@ def quit_game(money):
         return False
     return True
 
+def derive_button_type_from_position(button):
+    left     = button.left
+    top      = button.top
+    height   = button.height
+    width    = button.width
+
+    if width == WIDTH_HIT_BUTTON and height == HEIGHT_HIT_BUTTON and left == LEFT_HIT_BUTTON and top == TOP_HIT_BUTTON:
+        return "HIT"
+    elif width == WIDTH_STAND_BUTTON and height == HEIGHT_STAND_BUTTON and left == LEFT_STAND_BUTTON and top == TOP_STAND_BUTTON:
+        return "STAND"
+    elif width == WIDTH_DOUBLE_DOWN_BUTTON and height == HEIGHT_DOUBLE_DOWN_BUTTON and left == LEFT_DOUBLE_DOWN_BUTTON and top == TOP_DOUBLE_DOWN_BUTTON:
+        return "DOUBLE_DOWN"
+    elif width == WIDTH_SPLIT_BUTTON and height == HEIGHT_SPLIT_BUTTON and left == LEFT_SPLIT_BUTTON and top == TOP_SPLIT_BUTTON:
+        return "SPLIT"
+    elif width == WIDTH_DEAL_BUTTON and height == HEIGHT_DEAL_BUTTON and left == LEFT_DEAL_BUTTON and top == TOP_DEAL_BUTTON:
+        return "DEAL"
+    else:
+        return "UNKNOWN"
+
+
+
+
+
+
+
 # main game  loop 
 run = True
 while run:
@@ -456,31 +509,48 @@ while run:
                     money_updated = False
                     current_hand_index = 0
             else:
+                
+                #check whether any of the currently active buttons were clicked
+                event_position = event.pos
 
-                # if player can hit, allo them to draw a card 
-                if buttons[0].collidepoint(event.pos) and hand_active:
-                    # if the cards are split let the hit until they reach higher then 21
-                    if want_split and isinstance(my_hand[0], list) and len(my_hand) == 2:
-                        my_hand, game_deck = deal_cards(my_hand, game_deck, want_split, current_hand_index)
-                        if calculate_score(my_hand[current_hand_index]) > 21:
-                            if current_hand_index == 0:
-                                current_hand_index = 1
-                                if calculate_score(my_hand[1]) > 21 :
+                clicked_button = None
+
+                for button in buttons:
+                    if button.collidepoint(event_position):
+                        clicked_button = button
+                        break
+
+                #if no button was clicked, skip to the next iteration of the loop
+                if clicked_button is None:
+                    continue
+
+
+                button_type = derive_button_type_from_position(clicked_button)
+
+
+                if button_type == "HIT":
+                    if hand_active:
+                        if want_split and isinstance(my_hand[0], list) and len(my_hand) == 2:
+                            # if the cards are split let the hit until they reach higher then 2
+                            my_hand, game_deck = deal_cards(my_hand, game_deck, want_split, current_hand_index)
+                            if calculate_score(my_hand[current_hand_index]) > 21:
+                                if current_hand_index == 0:
+                                    current_hand_index = 1
+                                    if calculate_score(my_hand[1]) > 21:
+                                        hand_active = False
+                                        reveal_dealer = True
+                                else:
                                     hand_active = False
                                     reveal_dealer = True
-
-                            else:
+                                    stand = True
+                        else:
+                            # this is not split 
+                            my_hand, game_deck = deal_cards(my_hand, game_deck)
+                            if calculate_score(my_hand) > 21:
                                 hand_active = False
                                 reveal_dealer = True
-                                stand=True
-                    else:
-                        # this is not split 
-                        my_hand, game_deck = deal_cards(my_hand, game_deck)
-                        if calculate_score(my_hand) > 21:
-                            hand_active = False
-                            reveal_dealer = True
                 # let player end turn( stand)
-                elif buttons[1].collidepoint(event.pos) and hand_active:
+                elif button_type == "STAND":
                     # if cards are split just let the end 1  part at a time
                     if want_split and isinstance(my_hand[0], list) and len(my_hand) == 2:
                         if current_hand_index == 0:
@@ -498,73 +568,35 @@ while run:
                         reveal_dealer = True
                         stand=True
 
-                elif len(buttons) == 4:
-                    #start game
-                    if buttons[3].collidepoint(event.pos) and '<rect(150, 220, 300, 100)>' in str(buttons):
-                        active = True
-                        initial_deal = True
-                        game_deck = copy.deepcopy(decks * one_deck)
-                        my_hand = []
-                        dealer_hand = []
-                        outcome = 0
-                        hand_active = True
-                        reveal_dealer = False
-                        outcome = 0
-                        add_score = True
-                        dealer_score = 0
-                        player_score = 0
-                        money_updated = False
-                        current_hand_index = 0
-                        double_down=False
-                        want_split=False
-                        stand=False
+                elif button_type == "DEAL":
+                    active = True
+                    initial_deal = True
+                    game_deck = copy.deepcopy(decks * one_deck)
+                    my_hand = []
+                    dealer_hand = []
+                    outcome = 0
+                    hand_active = True
+                    reveal_dealer = False
+                    outcome = 0
+                    add_score = True
+                    dealer_score = 0
+                    player_score = 0
+                    money_updated = False
+                    current_hand_index = 0
+                    double_down=False
+                    want_split=False
+                    stand=False
 
-
-                        
-
-                        # makes the split option 
-                    elif buttons[3].collidepoint(event.pos) and '<rect(300, 500, 300, 100)>' in str(buttons):
-                        want_split = True
-                        my_hand = split_cards(want_split, my_hand)
-                        split_cards(want_split, my_hand)
-                    # try double down 
-                    elif buttons[3].collidepoint(event.pos) and '<rect(300, 0, 300, 100)>' in str(buttons):
-                        print('works')
-                        double_down = True
-                        change_color_double_down(double_down,stand)
-
-
-                elif len(buttons) == 3:
-                    #start game
-                    if buttons[2].collidepoint(event.pos) and '<rect(150, 220, 300, 100)>' in str(buttons):
-                        active = True
-                        initial_deal = True
-                        game_deck = copy.deepcopy(decks * one_deck)
-                        my_hand = []
-                        dealer_hand = []
-                        outcome = 0
-                        hand_active = True
-                        reveal_dealer = False
-                        outcome = 0
-                        add_score = True
-                        dealer_score = 0
-                        player_score = 0
-                        money_updated = False
-                        current_hand_index = 0
-                        stand=False
-                        
-
-                        # makes the split option 
-                    elif buttons[2].collidepoint(event.pos) and '<rect(300, 500, 300, 100)>' in str(buttons):
-                        want_split = True
-                        my_hand = split_cards(want_split, my_hand)
-                        split_cards(want_split, my_hand)
-                    # try double down 
-                    elif buttons[2].collidepoint(event.pos) and '<rect(300, 0, 300, 100)>' in str(buttons):
-                        print('works')
-                        double_down = True
-                        change_color_double_down(double_down,stand)
-
+                # makes the split option 
+                elif button_type == "SPLIT":
+                    want_split = True
+                    my_hand = split_cards(want_split, my_hand)
+                    split_cards(want_split, my_hand)
+                # try double down 
+                elif button_type == "DOUBLE_DOWN":
+                    print('works')
+                    double_down = True
+                    change_color_double_down(double_down,stand)
 
 
     # if player busts, autmaticlly end turn - treat like a stand
