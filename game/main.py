@@ -15,13 +15,18 @@ HEIGHT_DEAL_BUTTON        = 100
 
 LEFT_HIT_BUTTON           = 0
 TOP_HIT_BUTTON            = 700
-WIDTH_HIT_BUTTON          = 300
+WIDTH_HIT_BUTTON          = 195
 HEIGHT_HIT_BUTTON         = 100
 
-LEFT_STAND_BUTTON         = 300
+LEFT_STAND_BUTTON         = 195
 TOP_STAND_BUTTON          = 700
-WIDTH_STAND_BUTTON        = 300
+WIDTH_STAND_BUTTON        = 195
 HEIGHT_STAND_BUTTON       = 100
+
+LEFT_SURRENDER_BUTTON     = 390
+TOP_SURRENDER_BUTTON      = 700
+WIDTH_SURRENDER_BUTTON    = 210
+HEIGHT_SURRENDER_BUTTON   = 100
 
 LEFT_DOUBLE_DOWN_BUTTON   = 300
 TOP_DOUBLE_DOWN_BUTTON    = 0
@@ -236,7 +241,7 @@ def draw_button(rectangle, background_color, border_color, text_color, text_posi
 
 def draw_button_with_double_border(rectangle, background_color, border_one_color, border_two_color, text_color, text_position, text):
     left, top, width, height = rectangle
-    
+
     main_rectangle = draw_button(rectangle, background_color, border_one_color, text_color, text_position, text)
 
     pygame.draw.rect(screen, border_two_color, [left + 3, top + 3, width - 6, height - 6], 3, 5)
@@ -258,15 +263,19 @@ def draw_game(act, records, result, aantal_games, money):
     else:
         # 00
         hit_rectangle = (LEFT_HIT_BUTTON, TOP_HIT_BUTTON, WIDTH_HIT_BUTTON, HEIGHT_HIT_BUTTON)
-        hit_text_position = (LEFT_HIT_BUTTON + 55, TOP_HIT_BUTTON + 35)
+        hit_text_position = (LEFT_HIT_BUTTON + 50, TOP_HIT_BUTTON + 35)
         button_list.append(draw_button(hit_rectangle, 'white', 'green', 'black', hit_text_position, 'HIT ME'))
         # 01
         stand_rectangle = (LEFT_STAND_BUTTON, TOP_STAND_BUTTON, WIDTH_STAND_BUTTON, HEIGHT_STAND_BUTTON)
         stand_text_position = (LEFT_STAND_BUTTON + 55, TOP_STAND_BUTTON + 35)
         button_list.append(draw_button(stand_rectangle, 'white', 'green', 'black', stand_text_position, 'STAND'))
         #02
+        surrender_rectangle = (LEFT_SURRENDER_BUTTON, TOP_SURRENDER_BUTTON, WIDTH_SURRENDER_BUTTON, HEIGHT_SURRENDER_BUTTON)
+        surrender_text_position = (LEFT_SURRENDER_BUTTON + 10, TOP_SURRENDER_BUTTON + 35)
+        button_list.append(draw_button(surrender_rectangle, 'white', 'red', 'black', surrender_text_position, 'SURRENDER'))
+        #03 
         double_down_rectangle = (LEFT_DOUBLE_DOWN_BUTTON, TOP_DOUBLE_DOWN_BUTTON, WIDTH_DOUBLE_DOWN_BUTTON, HEIGHT_DOUBLE_DOWN_BUTTON)
-        double_down_text_position = (LEFT_DOUBLE_DOWN_BUTTON + 55, TOP_DOUBLE_DOWN_BUTTON + 35)
+        double_down_text_position = (LEFT_DOUBLE_DOWN_BUTTON + 35, TOP_DOUBLE_DOWN_BUTTON + 35)
         button_list.append(draw_button(double_down_rectangle, 'white', 'gold', 'black', double_down_text_position, 'DOUBLE DOWN'))
 
         score_text = font.render(f'Wins: {records[0]} Losses: {records[1]} Tie: {records[2]}', True, 'white')
@@ -285,15 +294,20 @@ def draw_game(act, records, result, aantal_games, money):
     #if ther is an outcome for the hand tat was played, display a restart button an tell user what happend
     if result != 0:
         new_hand_rectangle = (LEFT_DEAL_BUTTON, TOP_DEAL_BUTTON, WIDTH_DEAL_BUTTON, HEIGHT_DEAL_BUTTON)
-        new_hand_text_position = (LEFT_DEAL_BUTTON + 15, TOP_DEAL_BUTTON + 30)
+        new_hand_text_position = (LEFT_DEAL_BUTTON + 55, TOP_DEAL_BUTTON + 35)
         button_list.append(draw_button_with_double_border(new_hand_rectangle, 'white', 'green', 'black', 'black', new_hand_text_position, 'NEW HAND'))
   #  print(button_list)
     return button_list
 
 
 # check endgam conditions function 
-def check_endgame(hand_act, deal_score, play_score, result, totals, add):
+def check_endgame(hand_act, deal_score, play_score, result, totals, surrender, add):
     # First check if my_hand exists and has elements
+    if surrender:
+        totals[1] += 1
+        add = False
+        return 5, totals, add
+
     if my_hand and len(my_hand) > 0:
         # For split hands
         if isinstance(my_hand[0], list) and len(my_hand) == 2:
@@ -360,15 +374,16 @@ def calculate_money(start_money, result, current_money, money_bet, want_split,do
     elif want_split or double_down:
         money_bet *= 2
         
-
-        
     if result in [1, 3]:  # Player busted or Dealer wins
         return current_money - money_bet
     elif result == 2:  # Player wins
         return current_money + money_bet
+    elif result == 5:
+        return current_money - round(money_bet/2)
     elif result == 4:  # Tie game
         return current_money  # No money change
     return current_money  # Default case
+
 def change_color_double_down(double_down, stand):
     if double_down and not stand:
         pygame.draw.rect(screen, 'purple', [LEFT_DOUBLE_DOWN_BUTTON, TOP_DOUBLE_DOWN_BUTTON, WIDTH_DOUBLE_DOWN_BUTTON, HEIGHT_DOUBLE_DOWN_BUTTON], 3, 5)
@@ -458,13 +473,10 @@ def derive_button_type_from_position(button):
         return "SPLIT"
     elif width == WIDTH_DEAL_BUTTON and height == HEIGHT_DEAL_BUTTON and left == LEFT_DEAL_BUTTON and top == TOP_DEAL_BUTTON:
         return "DEAL"
+    elif width == WIDTH_SURRENDER_BUTTON and height == HEIGHT_SURRENDER_BUTTON and left == LEFT_SURRENDER_BUTTON and top == TOP_SURRENDER_BUTTON:
+        return "SURRENDER"
     else:
         return "UNKNOWN"
-
-
-
-
-
 
 
 # main game  loop 
@@ -502,6 +514,8 @@ while run:
             draw_scores(player_score, dealer_score)
     buttons = draw_game(active, records, outcome, aantal_games, money)
     change_color_double_down(double_down, stand)
+
+    surrender = False
 
     # enent handling, if quit pressed, then exit game
     for event in pygame.event.get():
@@ -610,13 +624,21 @@ while run:
                     double_down = True
                     change_color_double_down(double_down,stand)
 
+                elif button_type == "SURRENDER":
+                    reveal_dealer = True
+                    surrender = True
+                    hand_active = False
+
 
     # if player busts, autmaticlly end turn - treat like a stand
     if hand_active and not want_split and calculate_score(my_hand) > 21:
         hand_active = False
         reveal_dealer = True
     
-    outcome, records, add_score = check_endgame(hand_active, dealer_score, player_score, outcome, records, add_score)
+    outcome, records, add_score = check_endgame(hand_active, dealer_score, player_score, outcome, records, surrender, add_score)
+
+    if surrender:
+        surrender  = False
 
     if outcome != 0 and not money_updated:
         money = calculate_money(start_money, outcome, money,money_bet,want_split,double_down)
