@@ -220,38 +220,54 @@ def calculate_score(hand):
     return hand_score
 # draw game conditions and buttons
 
+
+def draw_button(rectangle, background_color, border_color, text_color, text_position, text):
+    left, top, width, height = rectangle
+    main_rectangle = pygame.draw.rect(screen, background_color, [left, top, width, height], 0, 5)
+
+    pygame.draw.rect(screen, border_color, [left, top, width, height], 3, 5)
+
+    deal_text = font.render(text, True, text_color)
+
+    text_left, text_top = text_position
+    screen.blit(deal_text, (text_left, text_top))
+
+    return main_rectangle
+
+def draw_button_with_double_border(rectangle, background_color, border_one_color, border_two_color, text_color, text_position, text):
+    left, top, width, height = rectangle
+    
+    main_rectangle = draw_button(rectangle, background_color, border_one_color, text_color, text_position, text)
+
+    pygame.draw.rect(screen, border_two_color, [left + 3, top + 3, width - 6, height - 6], 3, 5)
+
+    return main_rectangle
+
+
 def draw_game(act, records, result, aantal_games, money):
     button_list = []
     # intitlaly on startuup ( not active )  only option is to deal new hand
 
     if not act: 
-        deal = pygame.draw.rect(screen, 'white', [LEFT_DEAL_BUTTON, TOP_DEAL_BUTTON, WIDTH_DEAL_BUTTON, HEIGHT_DEAL_BUTTON], 0, 5)
-        pygame.draw.rect(screen, 'green', [LEFT_DEAL_BUTTON, TOP_DEAL_BUTTON, WIDTH_DEAL_BUTTON, HEIGHT_DEAL_BUTTON], 3, 5)
-        deal_text = font.render('DEAL HAND', True, 'black')
-        screen.blit(deal_text, (LEFT_DEAL_BUTTON+55, TOP_DEAL_BUTTON+35))
-        button_list.append(deal)
+        deal_rectangle = (LEFT_DEAL_BUTTON, TOP_DEAL_BUTTON, WIDTH_DEAL_BUTTON, HEIGHT_DEAL_BUTTON)
+        text_position  = (LEFT_DEAL_BUTTON + 55, TOP_DEAL_BUTTON + 35)
+        button_list.append(draw_button(deal_rectangle, 'white', 'green', 'black', text_position, 'DEAL HAND'))
         screen.blit(font.render(f' Money {money}', True, 'white'), (0, 0))
     # one game started, shot hit and stand , split ( if needed), Double down buttons and  win/loss records
 
     else:
         # 00
-        hit = pygame.draw.rect(screen, 'white', [LEFT_HIT_BUTTON, TOP_HIT_BUTTON, WIDTH_HIT_BUTTON, HEIGHT_HIT_BUTTON], 0, 5)
-        pygame.draw.rect(screen, 'green', [LEFT_HIT_BUTTON, TOP_HIT_BUTTON, WIDTH_HIT_BUTTON, HEIGHT_HIT_BUTTON], 3, 5)
-        hit_text = font.render('HIT ME', True, 'black')
-        screen.blit(hit_text, (LEFT_HIT_BUTTON+55, TOP_HIT_BUTTON+35))
-        button_list.append(hit)
+        hit_rectangle = (LEFT_HIT_BUTTON, TOP_HIT_BUTTON, WIDTH_HIT_BUTTON, HEIGHT_HIT_BUTTON)
+        hit_text_position = (LEFT_HIT_BUTTON + 55, TOP_HIT_BUTTON + 35)
+        button_list.append(draw_button(hit_rectangle, 'white', 'green', 'black', hit_text_position, 'HIT ME'))
         # 01
-        stand = pygame.draw.rect(screen, 'white', [LEFT_STAND_BUTTON, TOP_STAND_BUTTON, WIDTH_STAND_BUTTON, HEIGHT_STAND_BUTTON], 0, 5)
-        pygame.draw.rect(screen, 'green', [LEFT_STAND_BUTTON, TOP_STAND_BUTTON, WIDTH_STAND_BUTTON, HEIGHT_STAND_BUTTON], 3, 5)
-        stand_text = font.render('STAND', True, 'black')
-        screen.blit(stand_text, (LEFT_STAND_BUTTON+55, TOP_STAND_BUTTON+35))
-        button_list.append(stand)
+        stand_rectangle = (LEFT_STAND_BUTTON, TOP_STAND_BUTTON, WIDTH_STAND_BUTTON, HEIGHT_STAND_BUTTON)
+        stand_text_position = (LEFT_STAND_BUTTON + 55, TOP_STAND_BUTTON + 35)
+        button_list.append(draw_button(stand_rectangle, 'white', 'green', 'black', stand_text_position, 'STAND'))
         #02
-        double_down = pygame.draw.rect(screen, 'white', [LEFT_DOUBLE_DOWN_BUTTON, TOP_DOUBLE_DOWN_BUTTON, WIDTH_DOUBLE_DOWN_BUTTON, HEIGHT_DOUBLE_DOWN_BUTTON], 0, 5)
-        pygame.draw.rect(screen, 'gold', [LEFT_DOUBLE_DOWN_BUTTON, TOP_DOUBLE_DOWN_BUTTON, WIDTH_DOUBLE_DOWN_BUTTON, HEIGHT_DOUBLE_DOWN_BUTTON], 3, 5)
-        double_down_text = font.render('Double Down', True, 'black')
-        screen.blit(double_down_text, (LEFT_DOUBLE_DOWN_BUTTON+55, TOP_DOUBLE_DOWN_BUTTON+35))
-        button_list.append(double_down)
+        double_down_rectangle = (LEFT_DOUBLE_DOWN_BUTTON, TOP_DOUBLE_DOWN_BUTTON, WIDTH_DOUBLE_DOWN_BUTTON, HEIGHT_DOUBLE_DOWN_BUTTON)
+        double_down_text_position = (LEFT_DOUBLE_DOWN_BUTTON + 55, TOP_DOUBLE_DOWN_BUTTON + 35)
+        button_list.append(draw_button(double_down_rectangle, 'white', 'gold', 'black', double_down_text_position, 'DOUBLE DOWN'))
 
         score_text = font.render(f'Wins: {records[0]} Losses: {records[1]} Tie: {records[2]}', True, 'white')
         screen.blit(score_text, (15, 840))
@@ -262,23 +278,19 @@ def draw_game(act, records, result, aantal_games, money):
         # draws splitbutton if apllicable 
         #03
         if possiblility_split(my_hand):
-            split = pygame.draw.rect(screen, 'white', [LEFT_SPLIT_BUTTON, TOP_SPLIT_BUTTON, WIDTH_SPLIT_BUTTON, HEIGHT_SPLIT_BUTTON], 0, 5)
-            pygame.draw.rect(screen, 'green', [LEFT_SPLIT_BUTTON, TOP_SPLIT_BUTTON, WIDTH_SPLIT_BUTTON, HEIGHT_SPLIT_BUTTON], 3, 5)
-            split_text = font.render('Split ?', True, 'black')
-            screen.blit(split_text, (LEFT_SPLIT_BUTTON+100, TOP_SPLIT_BUTTON+35))
-            button_list.append(split)
-    #if ther is an outcome for the hand tat was played, display a restart button an tell user what happend
+            split_rectangle = (LEFT_SPLIT_BUTTON, TOP_SPLIT_BUTTON, WIDTH_SPLIT_BUTTON, HEIGHT_SPLIT_BUTTON)
+            split_text_position = (LEFT_SPLIT_BUTTON + 55, TOP_SPLIT_BUTTON + 35)
+            button_list.append(draw_button(split_rectangle, 'white', 'green', 'black', split_text_position, 'SPLIT'))
 
+    #if ther is an outcome for the hand tat was played, display a restart button an tell user what happend
     if result != 0:
-        screen.blit(font.render(results[result], True, 'white'), (15, 25))
-        deal = pygame.draw.rect(screen, 'white', [LEFT_DEAL_BUTTON, TOP_DEAL_BUTTON, WIDTH_DEAL_BUTTON, HEIGHT_DEAL_BUTTON], 0, 5)
-        pygame.draw.rect(screen, 'green', [LEFT_DEAL_BUTTON, TOP_DEAL_BUTTON, WIDTH_DEAL_BUTTON, HEIGHT_DEAL_BUTTON], 3, 5)
-        pygame.draw.rect(screen, 'black', [LEFT_DEAL_BUTTON+3, TOP_DEAL_BUTTON+3, WIDTH_DEAL_BUTTON-6, HEIGHT_DEAL_BUTTON-6], 3, 5)
-        deal_text = font.render('New HAND', True, 'black')
-        screen.blit(deal_text, (LEFT_DEAL_BUTTON+15, TOP_DEAL_BUTTON+30))
-        button_list.append(deal)
+        new_hand_rectangle = (LEFT_DEAL_BUTTON, TOP_DEAL_BUTTON, WIDTH_DEAL_BUTTON, HEIGHT_DEAL_BUTTON)
+        new_hand_text_position = (LEFT_DEAL_BUTTON + 15, TOP_DEAL_BUTTON + 30)
+        button_list.append(draw_button_with_double_border(new_hand_rectangle, 'white', 'green', 'black', 'black', new_hand_text_position, 'NEW HAND'))
   #  print(button_list)
     return button_list
+
+
 # check endgam conditions function 
 def check_endgame(hand_act, deal_score, play_score, result, totals, add):
     # First check if my_hand exists and has elements
