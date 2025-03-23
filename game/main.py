@@ -44,7 +44,7 @@ decks = 4
 WIDTH = 600
 HEIGHT = 900
 screen = pygame.display.set_mode([WIDTH, HEIGHT])
-pygame.display.set_caption('Pygame Blackjack!')
+pygame.display.set_caption('Pygame Blackjack Super Fun 21')
 fps = 60
 timer = pygame.time.Clock()
 
@@ -70,7 +70,8 @@ results = ['', 'Player busted o_0', 'Player wins! :)', 'Dealer wins:(', 'Tie gam
 # money
 start_money = 100  # or whatever starting amount you want
 money = start_money  # This ensures money starts as an integer
-money_bet = 20
+#money_bet = int(input('Imput a amount in numbers please'))
+money_bet=20
 money_updated = False
 # split
 may_split = False
@@ -78,15 +79,15 @@ amount_splits = 0
 want_split = False
 current_hand_index = 0  # Track which hand is active during split
 
-# double down
+# double down for double down collor change
 double_down = False
-#stand for double down collor change
+#stand 
 stand=False
 
 # aantaal games 
 aantal_games = 0
 
-# deal cards by selecting randomly from deck, and make function for one card at a time
+
 
 def deal_cards(current_hand, current_deck, want_split=False, hand_index=0):
     if want_split and isinstance(current_hand[0], list) and len(current_hand) == 2:
@@ -99,7 +100,7 @@ def deal_cards(current_hand, current_deck, want_split=False, hand_index=0):
         current_deck.pop(card)
     return current_hand, current_deck
 
-# show the amount of money you have and the amount you bet.
+# show the amount of money you have.
 def draw_money(money, result):
     
     screen.blit(font.render(f' Money [{money}]', True, 'white'), (0, 0))
@@ -112,7 +113,7 @@ def draw_scores(player, dealer):
     if reveal_dealer:
         screen.blit(font.render(f'Score[{dealer}]', True, 'white'), (350, 100))
 
-# draw cards visually ont screen 
+# draw cards visually on the screen 
 def draw_cards(player, dealer, reveal):
     if not isinstance(player[0], list):
         for i in range(len(player)):
@@ -127,7 +128,7 @@ def draw_cards(player, dealer, reveal):
                 pygame.draw.rect(screen, 'white', [70 + (70 * i), 460 + (5 * i), 120, 220], 0, 5)
                 screen.blit(font.render(hands[i], True, 'black'), (75 + 70 * i, 465 + 5 * i))
                 screen.blit(font.render(hands[i], True, 'black'), (75 + 70 * i, 635 + 5 * i))
-                pygame.draw.rect(screen, 'purple', [70 + (70 * i), 460 + (5 * i), 120, 220], 5, 5)
+                pygame.draw.rect(screen, 'purple', [70 + (70 * i), 460 + (5 * i), 120, 220], 5, 5)  #!!!!!
      # if player hasn't finished turn, dealer will hide one card
     for i in range(len(dealer)):
         pygame.draw.rect(screen, 'white', [70 + (70 * i), 160 + (5 * i), 120, 220], 0, 5)
@@ -300,13 +301,13 @@ def draw_game(act, records, result, aantal_games, money):
     return button_list
 
 
-# check endgam conditions function 
+# check endgame conditions function 
 def check_endgame(hand_act, deal_score, play_score, result, totals, surrender, add):
     # First check if my_hand exists and has elements
     if surrender:
         totals[1] += 1
         add = False
-        return 5, totals, add
+        return 5, totals, add # five is to to calcute the money in surrender
 
     if my_hand and len(my_hand) > 0:
         # For split hands
